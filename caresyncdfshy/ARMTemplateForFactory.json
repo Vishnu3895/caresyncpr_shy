@@ -370,6 +370,14 @@
 								"source_table_name": {
 									"value": "@activity('Read the table').output.firstRow.source_table_name",
 									"type": "Expression"
+								},
+								"merge_keys": {
+									"value": "@coalesce(activity('Read the table').output.firstRow.merge_keys,'')",
+									"type": "Expression"
+								},
+								"load_type": {
+									"value": "@activity('Read the table').output.firstRow.load_type",
+									"type": "Expression"
 								}
 							}
 						},
@@ -438,7 +446,8 @@
 						"defaultValue": 1
 					},
 					"adf_run_id": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "a1"
 					}
 				},
 				"variables": {
@@ -545,6 +554,10 @@
 											"table_id": {
 												"value": "@item().table_id",
 												"type": "Expression"
+											},
+											"adf_run_id": {
+												"value": "@variables('pipeline_run_in')",
+												"type": "Expression"
 											}
 										}
 									}
@@ -552,7 +565,14 @@
 								{
 									"name": "In progress status",
 									"type": "Script",
-									"dependsOn": [],
+									"dependsOn": [
+										{
+											"activity": "Set pipelineID",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
 									"policy": {
 										"timeout": "0.12:00:00",
 										"retry": 0,
@@ -570,7 +590,7 @@
 											{
 												"type": "Query",
 												"text": {
-													"value": "insert into ctrl.audit_log(adf_run_id,table_id,stage,start_time,status)\nvalues('@{pipeline().parameters.adf_run_id}',@{item().table_id},'SOURCE_TO_SILVER',SYSUTCDATETIME(),'IN_PROGRESS')",
+													"value": "insert into ctrl.audit_log(adf_run_id,table_id,stage,start_time,status)\nvalues('@{variables('pipeline_run_in')}',@{item().table_id},'SOURCE_TO_SILVER',SYSUTCDATETIME(),'IN_PROGRESS')",
 													"type": "Expression"
 												}
 											}
@@ -606,12 +626,29 @@
 											{
 												"type": "Query",
 												"text": {
-													"value": "update ctrl.audit_log\nset status = 'FAILED' ,end_time = SYSUTCDATETIME() \nwhere adf_run_id = '@{pipeline().parameters.adf_run_id}' and table_id = @{item().table_id}",
+													"value": "update ctrl.audit_log\nset status = 'FAILED' ,end_time = SYSUTCDATETIME() \nwhere adf_run_id = '@{variables('pipeline_run_in')}' and table_id = @{item().table_id}",
 													"type": "Expression"
 												}
 											}
 										],
 										"scriptBlockExecutionTimeout": "02:00:00"
+									}
+								},
+								{
+									"name": "Set pipelineID",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "pipeline_run_in",
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										}
 									}
 								}
 							]
@@ -625,10 +662,11 @@
 					"source_system": {
 						"type": "string",
 						"defaultValue": "neon_postgres"
-					},
-					"adf_run_id": {
-						"type": "string",
-						"defaultValue": "a1"
+					}
+				},
+				"variables": {
+					"pipeline_run_in": {
+						"type": "String"
 					}
 				},
 				"annotations": []
