@@ -221,7 +221,7 @@
 						{
 							"type": "Query",
 							"text": {
-								"value": "insert into ctrl.audit_log(adf_run_id,table_id,stage,start_time,status)\nvalues('@{pipeline().parameters.adf_run_id}',@{activity('Read the table').output.firstRow.table_id},'SOURCE_TO_SILVER',SYSUTCDATETIME(),'SUCCESS')",
+								"value": "insert into ctrl.audit_log(adf_run_id,table_id,stage,start_time,status,records_written)\nvalues('@{pipeline().parameters.adf_run_id}',@{activity('Read the table').output.firstRow.table_id},'SOURCE_TO_SILVER',SYSUTCDATETIME(),'SUCCESS',activity('BRONZE_TO_SILVER').output)",
 								"type": "Expression"
 							}
 						}
