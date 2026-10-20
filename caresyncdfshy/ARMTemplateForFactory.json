@@ -292,7 +292,7 @@
 								{
 									"type": "Query",
 									"text": {
-										"value": "update ctrl.audit_log\nset status = 'SUCCESS' ,end_time = SYSUTCDATETIME() ,records_written = @{activity('BRONZE_TO_SILVER').output})\nwhere adf_run_id = @{pipeline().parameters.adf_run_id} and table_id = @{pipeline().parameters.table_id}",
+										"value": "update ctrl.audit_log\nset status = 'SUCCESS',end_time = SYSUTCDATETIME(),records_written = @{activity('BRONZE_TO_SILVER').output.runOutput}\nwhere adf_run_id = '@{pipeline().parameters.adf_run_id}' and table_id = @{pipeline().parameters.table_id}",
 										"type": "Expression"
 									}
 								}
@@ -376,6 +376,42 @@
 						"linkedServiceName": {
 							"referenceName": "ls_azuredb",
 							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Update watermark",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "BRONZE_TO_SILVER",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "ls_azuresqldb",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "update ctrl.watermark\nset watermark_value = @{variables('current_time')}",
+										"type": "Expression"
+									}
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
 						}
 					}
 				],
@@ -556,7 +592,7 @@
 											{
 												"type": "Query",
 												"text": {
-													"value": "update ctrl.audit_log\nset status = 'FAILED' ,end_time = SYSUTCDATETIME() \nwhere adf_run_id = @{pipeline().parameters.adf_run_id} and table_id = @{item().table_id}",
+													"value": "update ctrl.audit_log\nset status = 'FAILED' ,end_time = SYSUTCDATETIME() \nwhere adf_run_id = '@{pipeline().parameters.adf_run_id}' and table_id = @{item().table_id}",
 													"type": "Expression"
 												}
 											}
