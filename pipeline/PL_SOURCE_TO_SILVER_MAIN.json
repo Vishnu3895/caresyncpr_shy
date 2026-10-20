@@ -46,7 +46,31 @@
 					"items": {
 						"value": "@activity('Read the table details').output.firstRow.table_id",
 						"type": "Expression"
-					}
+					},
+					"activities": [
+						{
+							"name": "Ingest table in this pipeline",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "PL_SOURCE_TO_SILVER_INNER",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": false,
+								"parameters": {
+									"table_id": {
+										"value": "@item().table_id",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
 				}
 			}
 		],
