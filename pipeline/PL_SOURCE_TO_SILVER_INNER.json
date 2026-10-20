@@ -33,6 +33,8 @@
 			{
 				"name": "Check load tye",
 				"type": "IfCondition",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Read the table",
@@ -129,6 +131,8 @@
 			{
 				"name": "Ingest from source to landing",
 				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Check load tye",
@@ -192,6 +196,30 @@
 						}
 					}
 				]
+			},
+			{
+				"name": "test",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Read the table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "test",
+					"value": {
+						"value": "@activity('Read the table').output.firstRow.source_schema_name",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
@@ -205,6 +233,9 @@
 				"type": "String"
 			},
 			"current_time": {
+				"type": "String"
+			},
+			"test": {
 				"type": "String"
 			}
 		},
