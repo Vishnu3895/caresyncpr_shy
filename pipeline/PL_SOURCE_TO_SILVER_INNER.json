@@ -192,12 +192,129 @@
 						}
 					}
 				]
+			},
+			{
+				"name": "Success status",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "BRONZE_TO_SILVER",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "ls_azuresqldb",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": {
+								"value": "insert into ctrl.audit_log(adf_run_id,table_id,stage,start_time,status)\nvalues('@{pipeline().parameters.adf_run_id}',@{activity('Read the table').output.firstRow.table_id},'SOURCE_TO_SILVER',SYSUTCDATETIME(),'SUCCESS')",
+								"type": "Expression"
+							}
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			},
+			{
+				"name": "LANDING_TO_BRONZE",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "Ingest from source to landing",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/nairshyamili11@gmail.com/caresyncshy/caresyncshydatab/LANDING_TO_BRONZE",
+					"baseParameters": {
+						"source_system": {
+							"value": "@activity('Read the table').output.firstRow.source_system",
+							"type": "Expression"
+						},
+						"landing_timestamp": {
+							"value": "@variables('current_time')",
+							"type": "Expression"
+						},
+						"source_table_name": {
+							"value": "@activity('Read the table').output.firstRow.source_table_name",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_azuredb",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "BRONZE_TO_SILVER",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "LANDING_TO_BRONZE",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/nairshyamili11@gmail.com/caresyncshy/caresyncshydatab/BRONZE_TO_SILVER",
+					"baseParameters": {
+						"landing_timestamp": {
+							"value": "@variables('current_time')",
+							"type": "Expression"
+						},
+						"source_table_name": {
+							"value": "@activity('Read the table').output.firstRow.source_table_name",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_azuredb",
+					"type": "LinkedServiceReference"
+				}
 			}
 		],
 		"parameters": {
 			"table_id": {
 				"type": "int",
 				"defaultValue": 1
+			},
+			"adf_run_id": {
+				"type": "string"
 			}
 		},
 		"variables": {
