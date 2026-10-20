@@ -53,7 +53,14 @@
 						{
 							"name": "Ingest table in this pipeline",
 							"type": "ExecutePipeline",
-							"dependsOn": [],
+							"dependsOn": [
+								{
+									"activity": "In progress status",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
 							"policy": {
 								"secureInput": false
 							},
@@ -71,6 +78,71 @@
 									}
 								}
 							}
+						},
+						{
+							"name": "In progress status",
+							"type": "Script",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "ls_azuresqldb",
+								"type": "LinkedServiceReference"
+							},
+							"typeProperties": {
+								"scripts": [
+									{
+										"type": "Query",
+										"text": {
+											"value": "insert into ctrl.audit_log(adf_run_id,table_id,stage,start_time,status)\nvalues('@{pipeline().parameters.adf_run_id}',@{item().table_id},'SOURCE_TO_SILVER',SYSUTCDATETIME(),'IN_PROGRESS')",
+											"type": "Expression"
+										}
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
+							}
+						},
+						{
+							"name": "Failed status",
+							"type": "Script",
+							"dependsOn": [
+								{
+									"activity": "Ingest table in this pipeline",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "ls_azuresqldb",
+								"type": "LinkedServiceReference"
+							},
+							"typeProperties": {
+								"scripts": [
+									{
+										"type": "Query",
+										"text": {
+											"value": "insert into ctrl.audit_log(adf_run_id,table_id,stage,start_time,status)\nvalues('@{pipeline().parameters.adf_run_id}',@{item().table_id},'SOURCE_TO_SILVER',SYSUTCDATETIME(),'FAILED')",
+											"type": "Expression"
+										}
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
+							}
 						}
 					]
 				}
@@ -80,6 +152,10 @@
 			"source_system": {
 				"type": "string",
 				"defaultValue": "neon_postgres"
+			},
+			"adf_run_id": {
+				"type": "string",
+				"defaultValue": "a1"
 			}
 		},
 		"annotations": []
