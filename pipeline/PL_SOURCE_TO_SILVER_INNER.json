@@ -299,6 +299,14 @@
 						"source_table_name": {
 							"value": "@activity('Read the table').output.firstRow.source_table_name",
 							"type": "Expression"
+						},
+						"merge_keys": {
+							"value": "@coalesce(activity('Read the table').output.firstRow.merge_keys,'')",
+							"type": "Expression"
+						},
+						"load_type": {
+							"value": "@activity('Read the table').output.firstRow.load_type",
+							"type": "Expression"
 						}
 					}
 				},
