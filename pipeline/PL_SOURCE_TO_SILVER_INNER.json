@@ -33,8 +33,6 @@
 			{
 				"name": "Check load tye",
 				"type": "IfCondition",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Read the table",
@@ -131,8 +129,6 @@
 			{
 				"name": "Ingest from source to landing",
 				"type": "Copy",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Check load tye",
@@ -190,36 +186,12 @@
 						"parameters": {
 							"container": "landing",
 							"folder": {
-								"value": "@{concat(\n    activity('Read the table').output.firstRow.source_system,\n    '/',\n    activity('Read the table').output.firstRow.source_table_name,\n    '/',\n    activity('Read the watermark').output.firstRow.watermark_value\n)}",
+								"value": "@{concat(\n    activity('Read the table').output.firstRow.source_system,\n    '/',\n    activity('Read the table').output.firstRow.source_table_name,\n    '/',\n    variables('current_time')\n)}",
 								"type": "Expression"
 							}
 						}
 					}
 				]
-			},
-			{
-				"name": "test",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "Read the table",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "test",
-					"value": {
-						"value": "@activity('Read the table').output.firstRow.source_schema_name",
-						"type": "Expression"
-					}
-				}
 			}
 		],
 		"parameters": {
