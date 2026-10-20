@@ -196,6 +196,8 @@
 			{
 				"name": "Success status",
 				"type": "Script",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "BRONZE_TO_SILVER",
@@ -306,6 +308,30 @@
 					"referenceName": "ls_azuredb",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "test",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Success status",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "test1",
+					"value": {
+						"value": "@{activity('BRONZE_TO_SILVER').output}",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
@@ -326,6 +352,9 @@
 			},
 			"test": {
 				"type": "String"
+			},
+			"test1": {
+				"type": "Integer"
 			}
 		},
 		"annotations": []
