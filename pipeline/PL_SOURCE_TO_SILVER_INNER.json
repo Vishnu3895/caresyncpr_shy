@@ -129,7 +129,14 @@
 			{
 				"name": "Ingest from source to landing",
 				"type": "Copy",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Check load tye",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -139,8 +146,52 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"enableStaging": false
-				}
+					"source": {
+						"type": "PostgreSqlV2Source",
+						"query": {
+							"value": "select * from @{activity('Read the table').output.firstRow.source_schema_name}.@{activity('Read the table').output.firstRow.source_table_name}\n@{\n    if(\n        equals(activity('Read the table').output.firstRow.load_type,'FULL'),\n    '',\n    concat('where ',activity('Read the table').output.firstRow.watermark_column,'>','''',activity('Read the watermark').output.firstRow.watermark_value,'''')\n    )\n}",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_postgres",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_parquet",
+						"type": "DatasetReference",
+						"parameters": {
+							"container": "landing",
+							"folder": {
+								"value": "@concat(\n    activity('Read the table').output.firstRow.source_system,\n    '/',\n    activity('Read the table').output.firstRow.source_table_name,\n    '/',\n    activity('Read the watermark').output.firstRow.watermark_value\n)",
+								"type": "Expression"
+							}
+						}
+					}
+				]
 			}
 		],
 		"parameters": {
