@@ -186,7 +186,7 @@
 						"parameters": {
 							"container": "landing",
 							"folder": {
-								"value": "@concat(\n    activity('Read the table').output.firstRow.source_system,\n    '/',\n    activity('Read the table').output.firstRow.source_table_name,\n    '/',\n    activity('Read the watermark').output.firstRow.watermark_value\n)",
+								"value": "concat(\n    activity('Read the table').output.firstRow.source_system,\n    '/',\n    activity('Read the table').output.firstRow.source_table_name,\n    '/',\n    activity('Read the watermark').output.firstRow.watermark_value\n)",
 								"type": "Expression"
 							}
 						}
