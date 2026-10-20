@@ -346,7 +346,7 @@
 									{
 										"type": "Query",
 										"text": {
-											"value": "update ctrl.watermark\nset watermark_value = '@{string(formatDateTime(variables('current_time'),'yyyy-MM-ddTHH:mm:ss'))}'",
+											"value": "update ctrl.watermark\nset watermark_value = '@{string(formatDateTime(variables('current_time'),'yyyy-MM-ddTHH:mm:ss'))}'\nwhere table_id = @{pipeline().parameters.table_id}",
 											"type": "Expression"
 										}
 									}
