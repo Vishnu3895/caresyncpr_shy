@@ -292,7 +292,7 @@
 								{
 									"type": "Query",
 									"text": {
-										"value": "insert into ctrl.audit_log(adf_run_id,table_id,stage,start_time,status,records_written)\nvalues('@{pipeline().parameters.adf_run_id}',@{activity('Read the table').output.firstRow.table_id},'SOURCE_TO_SILVER',SYSUTCDATETIME(),'SUCCESS',@{activity('BRONZE_TO_SILVER').output})",
+										"value": "update ctrl.audit_log\nset status = 'SUCCESS' ,end_time = SYSUTCDATETIME() ,records_written = @{activity('BRONZE_TO_SILVER').output})\nwhere adf_run_id = @{pipeline().parameters.adf_run_id} and table_id = @{pipeline().parameters.table_id}",
 										"type": "Expression"
 									}
 								}
@@ -400,6 +400,9 @@
 					},
 					"test": {
 						"type": "String"
+					},
+					"test1": {
+						"type": "Integer"
 					}
 				},
 				"annotations": []
@@ -553,7 +556,7 @@
 											{
 												"type": "Query",
 												"text": {
-													"value": "insert into ctrl.audit_log(adf_run_id,table_id,stage,start_time,status)\nvalues('@{pipeline().parameters.adf_run_id}',@{item().table_id},'SOURCE_TO_SILVER',SYSUTCDATETIME(),'FAILED')",
+													"value": "update ctrl.audit_log\nset status = 'FAILED' ,end_time = SYSUTCDATETIME() \nwhere adf_run_id = @{pipeline().parameters.adf_run_id} and table_id = @{item().table_id}",
 													"type": "Expression"
 												}
 											}
