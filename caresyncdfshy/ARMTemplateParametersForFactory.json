@@ -1,0 +1,48 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "caresyncdfshy"
+		},
+		"ls_azuredb_accessToken": {
+			"value": ""
+		},
+		"ls_azuresqldb_password": {
+			"value": ""
+		},
+		"ls_datalake_accountKey": {
+			"value": ""
+		},
+		"ls_postgres_password": {
+			"value": ""
+		},
+		"ls_azuredb_properties_typeProperties_existingClusterId": {
+			"value": "1020-073203-ljnwbwd7"
+		},
+		"ls_azuresqldb_properties_typeProperties_server": {
+			"value": "caresyncshysr.database.windows.net"
+		},
+		"ls_azuresqldb_properties_typeProperties_database": {
+			"value": "caresyncshydb"
+		},
+		"ls_azuresqldb_properties_typeProperties_userName": {
+			"value": "caresyncshydbsr"
+		},
+		"ls_datalake_properties_typeProperties_url": {
+			"value": "https://caresyncstrshy.dfs.core.windows.net/"
+		},
+		"ls_keyvault_properties_typeProperties_baseUrl": {
+			"value": "https://caresyncshykey.vault.azure.net/"
+		},
+		"ls_postgres_properties_typeProperties_server": {
+			"value": "ep-crimson-dawn-b4kihtvs-pooler.c-6.us-east-2.aws.neon.tech"
+		},
+		"ls_postgres_properties_typeProperties_database": {
+			"value": "neondb"
+		},
+		"ls_postgres_properties_typeProperties_username": {
+			"value": "neondb_owner"
+		}
+	}
+}
