@@ -439,7 +439,7 @@
 											"parameters": {
 												"container": "source",
 												"folder": {
-													"value": "@{concat(\n    activity('Read the table').output.firstRow.source_system,\n    '/',\n    activity('Read the table').output.firstRow.source_table_name,\n    '/'\n)}",
+													"value": "@{concat(\n    activity('Read the table').output.firstRow.source_system,\n    '/',\n    activity('Read the table').output.firstRow.source_table_name,\n    '/',\n    '*.csv'\n)}",
 													"type": "Expression"
 												}
 											}
