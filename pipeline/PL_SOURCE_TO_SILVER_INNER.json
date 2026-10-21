@@ -435,7 +435,14 @@
 									"inputs": [
 										{
 											"referenceName": "ds_sourceadlscsv",
-											"type": "DatasetReference"
+											"type": "DatasetReference",
+											"parameters": {
+												"container": "source",
+												"folder": {
+													"value": "@{concat(\n    activity('Read the table').output.firstRow.source_system,\n    '/',\n    activity('Read the table').output.firstRow.source_table_name\n)}",
+													"type": "Expression"
+												}
+											}
 										}
 									],
 									"outputs": [
