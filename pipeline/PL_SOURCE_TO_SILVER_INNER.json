@@ -398,18 +398,17 @@
 									"userProperties": [],
 									"typeProperties": {
 										"source": {
-											"type": "BinarySource",
+											"type": "DelimitedTextSource",
 											"storeSettings": {
 												"type": "AzureBlobFSReadSettings",
 												"recursive": true,
 												"modifiedDatetimeStart": {
 													"value": "@activity('Read the watermark').output.firstRow.watermark_value",
 													"type": "Expression"
-												},
-												"deleteFilesAfterCompletion": false
+												}
 											},
 											"formatSettings": {
-												"type": "BinaryReadSettings"
+												"type": "DelimitedTextReadSettings"
 											}
 										},
 										"sink": {
@@ -423,19 +422,20 @@
 												"fileExtension": ".txt"
 											}
 										},
-										"enableStaging": false
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
 									},
 									"inputs": [
 										{
-											"referenceName": "ds_adlscsv",
-											"type": "DatasetReference",
-											"parameters": {
-												"container": "source",
-												"folder": {
-													"value": "@{concat(\n    activity('Read the table').output.firstRow.source_system,\n    '/',\n    activity('Read the table').output.firstRow.source_table_name\n    )}",
-													"type": "Expression"
-												}
-											}
+											"referenceName": "ds_sourceadlscsv",
+											"type": "DatasetReference"
 										}
 									],
 									"outputs": [
