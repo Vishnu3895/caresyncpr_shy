@@ -468,6 +468,23 @@
 						}
 					]
 				}
+			},
+			{
+				"name": "Fail status",
+				"type": "Fail",
+				"dependsOn": [
+					{
+						"activity": "BRONZE_TO_SILVER",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"message": "Your pipeline met with some failure ",
+					"errorCode": "500"
+				}
 			}
 		],
 		"parameters": {
