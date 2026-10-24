@@ -484,9 +484,9 @@
 													"type": "BinarySource",
 													"storeSettings": {
 														"type": "AzureBlobFSReadSettings",
-														"recursive": true,
+														"recursive": false,
 														"modifiedDatetimeStart": {
-															"value": "@activity('Read the watermark').output.firstRow.watermark_value",
+															"value": "@if(equals(activity('Read the table').output.firstRow.table_id,4),\n    activity('Read the watermark').output.firstRow.watermark_value,\n    '')",
 															"type": "Expression"
 														},
 														"deleteFilesAfterCompletion": false
