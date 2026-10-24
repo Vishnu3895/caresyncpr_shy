@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "caresyncdfshy"
 		},
+		"ds_binadls_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ds_binadls'"
+		},
 		"ls_azuredb_accessToken": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accessToken' of 'ls_azuredb'"
@@ -22,6 +26,10 @@
 		"ls_postgres_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'ls_postgres'"
+		},
+		"ds_binadls_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://caresyncstrshy.dfs.core.windows.net/"
 		},
 		"ls_azuredb_properties_typeProperties_existingClusterId": {
 			"type": "string",
@@ -86,6 +94,9 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"ds_binadls_accountKey": {
+						"value": "[parameters('ds_binadls_accountKey')]"
+					},
 					"ls_azuredb_accessToken": {
 						"value": "[parameters('ls_azuredb_accessToken')]"
 					},
@@ -97,6 +108,9 @@
 					},
 					"ls_postgres_password": {
 						"value": "[parameters('ls_postgres_password')]"
+					},
+					"ds_binadls_properties_typeProperties_url": {
+						"value": "[parameters('ds_binadls_properties_typeProperties_url')]"
 					},
 					"ls_azuredb_properties_typeProperties_existingClusterId": {
 						"value": "[parameters('ls_azuredb_properties_typeProperties_existingClusterId')]"

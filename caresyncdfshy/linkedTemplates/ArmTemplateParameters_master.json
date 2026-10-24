@@ -5,6 +5,9 @@
 		"factoryName": {
 			"value": "caresyncdfshy"
 		},
+		"ds_binadls_accountKey": {
+			"value": ""
+		},
 		"ls_azuredb_accessToken": {
 			"value": ""
 		},
@@ -16,6 +19,9 @@
 		},
 		"ls_postgres_password": {
 			"value": ""
+		},
+		"ds_binadls_properties_typeProperties_url": {
+			"value": "https://caresyncstrshy.dfs.core.windows.net/"
 		},
 		"ls_azuredb_properties_typeProperties_existingClusterId": {
 			"value": "1020-073203-ljnwbwd7"

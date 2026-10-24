@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "caresyncdfshy"
 		},
+		"ds_binadls_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ds_binadls'"
+		},
 		"ls_azuredb_accessToken": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accessToken' of 'ls_azuredb'"
@@ -22,6 +26,10 @@
 		"ls_postgres_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'ls_postgres'"
+		},
+		"ds_binadls_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://caresyncstrshy.dfs.core.windows.net/"
 		},
 		"ls_azuredb_properties_typeProperties_existingClusterId": {
 			"type": "string",
@@ -469,7 +477,7 @@
 											"userProperties": [],
 											"typeProperties": {
 												"source": {
-													"type": "DelimitedTextSource",
+													"type": "BinarySource",
 													"storeSettings": {
 														"type": "AzureBlobFSReadSettings",
 														"recursive": true,
@@ -477,40 +485,23 @@
 															"value": "@activity('Read the watermark').output.firstRow.watermark_value",
 															"type": "Expression"
 														},
-														"wildcardFolderPath": {
-															"value": "@{concat(\n    activity('Read the table').output.firstRow.source_system,\n    '/',\n    activity('Read the table').output.firstRow.source_table_name,\n    '/'\n)}",
-															"type": "Expression"
-														},
-														"wildcardFileName": "*.csv"
+														"deleteFilesAfterCompletion": false
 													},
 													"formatSettings": {
-														"type": "DelimitedTextReadSettings"
+														"type": "BinaryReadSettings"
 													}
 												},
 												"sink": {
-													"type": "DelimitedTextSink",
+													"type": "BinarySink",
 													"storeSettings": {
 														"type": "AzureBlobFSWriteSettings"
-													},
-													"formatSettings": {
-														"type": "DelimitedTextWriteSettings",
-														"quoteAllText": true,
-														"fileExtension": ".txt"
 													}
 												},
-												"enableStaging": false,
-												"translator": {
-													"type": "TabularTranslator",
-													"typeConversion": true,
-													"typeConversionSettings": {
-														"allowDataTruncation": true,
-														"treatBooleanAsNumber": false
-													}
-												}
+												"enableStaging": false
 											},
 											"inputs": [
 												{
-													"referenceName": "ds_sourceadlscsv",
+													"referenceName": "ds_adlsbinso",
 													"type": "DatasetReference",
 													"parameters": {
 														"container": "source",
@@ -523,7 +514,7 @@
 											],
 											"outputs": [
 												{
-													"referenceName": "dssinkcsv",
+													"referenceName": "ds_sinkbin",
 													"type": "DatasetReference",
 													"parameters": {
 														"container": "landing",
@@ -541,20 +532,19 @@
 						}
 					},
 					{
-						"name": "Fail status",
+						"name": "Decalre failure",
 						"type": "Fail",
 						"dependsOn": [
 							{
 								"activity": "BRONZE_TO_SILVER",
 								"dependencyConditions": [
-									"Succeeded",
 									"Failed"
 								]
 							}
 						],
 						"userProperties": [],
 						"typeProperties": {
-							"message": "Your pipeline met with some failure ",
+							"message": "Pipeline met with some failure",
 							"errorCode": "500"
 						}
 					}
@@ -594,8 +584,8 @@
 				"[concat(variables('factoryId'), '/linkedServices/ls_azuredb')]",
 				"[concat(variables('factoryId'), '/datasets/ds_postgres')]",
 				"[concat(variables('factoryId'), '/datasets/ds_parquet')]",
-				"[concat(variables('factoryId'), '/datasets/ds_sourceadlscsv')]",
-				"[concat(variables('factoryId'), '/datasets/dssinkcsv')]"
+				"[concat(variables('factoryId'), '/datasets/ds_adlsbinso')]",
+				"[concat(variables('factoryId'), '/datasets/ds_sinkbin')]"
 			]
 		},
 		{
@@ -814,6 +804,43 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ds_adlsbinso')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_datalake",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"container": {
+						"type": "string"
+					},
+					"folder": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@dataset().folder",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().container",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_datalake')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ds_adlscsv')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -908,6 +935,43 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ds_sinkbin')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_datalake",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"container": {
+						"type": "string"
+					},
+					"folder": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@dataset().folder",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().container",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_datalake')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ds_sourceadlscsv')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -990,6 +1054,23 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/ls_datalake')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_binadls')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('ds_binadls_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('ds_binadls_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ls_azuredb')]",
