@@ -273,6 +273,10 @@
 								"source_table_name": {
 									"value": "@activity('Read the table').output.firstRow.source_table_name",
 									"type": "Expression"
+								},
+								"source_file_format": {
+									"value": "@coalesce(activity('Read the table').output.firstRow.source_file_format,'')",
+									"type": "Expression"
 								}
 							}
 						},
