@@ -476,7 +476,8 @@
 					{
 						"activity": "BRONZE_TO_SILVER",
 						"dependencyConditions": [
-							"Succeeded"
+							"Succeeded",
+							"Failed"
 						]
 					}
 				],
