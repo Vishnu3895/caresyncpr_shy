@@ -453,20 +453,19 @@
 				}
 			},
 			{
-				"name": "Fail status",
+				"name": "Decalre failure",
 				"type": "Fail",
 				"dependsOn": [
 					{
 						"activity": "BRONZE_TO_SILVER",
 						"dependencyConditions": [
-							"Succeeded",
 							"Failed"
 						]
 					}
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"message": "Your pipeline met with some failure ",
+					"message": "Pipeline met with some failure",
 					"errorCode": "500"
 				}
 			}
