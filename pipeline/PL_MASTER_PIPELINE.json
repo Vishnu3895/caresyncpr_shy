@@ -22,7 +22,14 @@
 						"referenceName": "PL_SOURCE_TO_SILVER_MAIN",
 						"type": "PipelineReference"
 					},
-					"waitOnCompletion": true
+					"waitOnCompletion": true,
+					"parameters": {
+						"adf_run_id": {
+							"value": "@variables('master_adf_runid')",
+							"type": "Expression"
+						},
+						"stage": "SOURCE_TO_SILVER"
+					}
 				}
 			},
 			{
@@ -49,7 +56,7 @@
 					"parameters": {
 						"stage": "SILVER_TO_GOLD",
 						"adf_run_id": {
-							"value": "@pipeline().RunId",
+							"value": "@variables('master_adf_runid')",
 							"type": "Expression"
 						}
 					}
