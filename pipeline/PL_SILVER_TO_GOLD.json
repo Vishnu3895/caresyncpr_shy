@@ -3,16 +3,9 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Update progress status",
-				"type": "Script",
-				"dependsOn": [
-					{
-						"activity": "Set pipeline ID",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"name": "Read the silver_to_gold config",
+				"type": "Lookup",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -21,38 +14,94 @@
 					"secureInput": false
 				},
 				"userProperties": [],
-				"linkedServiceName": {
-					"referenceName": "ls_azuresqldb",
-					"type": "LinkedServiceReference"
-				},
 				"typeProperties": {
-					"scripts": [
-						{
-							"type": "Query",
-							"text": {
-								"value": "insert into ctrl.audit_log(adf_run_id,table_id,stage,start_time,status)\nvalues('@{variables('pipeline_id')}',@{item().table_id},'SILVER_TO_GOLD',SYSUTCDATETIME(),'IN_PROGRESS')",
-								"type": "Expression"
-							}
-						}
-					],
-					"scriptBlockExecutionTimeout": "02:00:00"
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "select * from ctrl.table_config where is_active = 1 and stage IN ('@{pipeline().parameters.stage}')",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "AzureSqlTable1",
+						"type": "DatasetReference"
+					}
 				}
 			},
 			{
-				"name": "Set pipeline ID",
-				"type": "SetVariable",
-				"dependsOn": [],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
-				},
+				"name": "For each activity",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Read the silver_to_gold config",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "pipeline_id",
-					"value": {
-						"value": "@pipeline().RunId",
+					"items": {
+						"value": "@activity('Read the silver_to_gold config').output.table_id",
 						"type": "Expression"
-					}
+					},
+					"activities": [
+						{
+							"name": "Set pipeline ID",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "pipeline_id",
+								"value": {
+									"value": "@pipeline().RunId",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Update progress status",
+							"type": "Script",
+							"dependsOn": [
+								{
+									"activity": "Set pipeline ID",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "ls_azuresqldb",
+								"type": "LinkedServiceReference"
+							},
+							"typeProperties": {
+								"scripts": [
+									{
+										"type": "Query",
+										"text": {
+											"value": "insert into ctrl.audit_log(adf_run_id,table_id,stage,start_time,status)\nvalues('@{variables('pipeline_id')}',@{item().table_id},'SILVER_TO_GOLD',SYSUTCDATETIME(),'IN_PROGRESS')",
+											"type": "Expression"
+										}
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
+							}
+						}
+					]
 				}
 			}
 		],
