@@ -275,7 +275,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"notebookPath": {
-											"value": "/Users/nairshyamili11gmail.com/caresyncshy/caresyncshydatab/NB_@{item().gold_table_name}",
+											"value": "/Users/nairshyamili11@gmail.com/caresyncshy/caresyncshydatab/NB_@{item().gold_table_name}",
 											"type": "Expression"
 										}
 									},
