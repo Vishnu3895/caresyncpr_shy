@@ -1,0 +1,83 @@
+{
+	"name": "PL_MASTER_PIPELINE",
+	"properties": {
+		"activities": [
+			{
+				"name": "Execute_source_to_silver",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Set master_pipeline",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "PL_SOURCE_TO_SILVER_MAIN",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Execute_silver_to_gold",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Execute_source_to_silver",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "PL_SILVER_TO_GOLD",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"stage": "SILVER_TO_GOLD",
+						"adf_run_id": {
+							"value": "@pipeline().RunId",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Set master_pipeline",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "master_adf_runid",
+					"value": {
+						"value": "@pipeline().RunId",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"master_adf_runid": {
+				"type": "String"
+			}
+		},
+		"annotations": []
+	}
+}
