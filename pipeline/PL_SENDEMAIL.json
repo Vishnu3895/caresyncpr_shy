@@ -69,11 +69,15 @@
 			{
 				"name": "Subject",
 				"type": "SetVariable",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Read the Ctrl_audit_log",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "count_success",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -86,20 +90,16 @@
 				"userProperties": [],
 				"typeProperties": {
 					"variableName": "subject",
-					"value": ""
+					"value": {
+						"value": "@{pipeline().globalParameters.URL}|@{if(activity('count_success').output.count,'FAILURE','SUCCESS')}|CARESYNC MASTER RUN",
+						"type": "Expression"
+					}
 				}
 			},
 			{
-				"name": "Lookup1",
+				"name": "count_success",
 				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "Read the Ctrl_audit_log",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -112,7 +112,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "select count('*') from @{activity('Read the Ctrl_audit_log').output.value} where status IN ('SUCCESS','IN_PROGRESS')",
+							"value": "select count(*) from ctrl.audit_log where adf_run_id ='@{pipeline().parameters.adf_run_id}' and status IN ('FAILURE','IN_PROGRESS')",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
