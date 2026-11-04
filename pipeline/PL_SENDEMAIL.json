@@ -91,7 +91,7 @@
 				"typeProperties": {
 					"variableName": "subject",
 					"value": {
-						"value": "@activity('count_success').output.value",
+						"value": "@activity('count_success').output.value.counts",
 						"type": "Expression"
 					}
 				}
