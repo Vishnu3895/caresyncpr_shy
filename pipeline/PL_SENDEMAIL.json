@@ -99,7 +99,7 @@
 				"typeProperties": {
 					"variableName": "subject",
 					"value": {
-						"value": "@{pipeline().globalParameters.env}|@{if(greater(activity('count_success').output.value,0),'FAILURE','SUCCESS')}|CARESYNC MASTER RUN",
+						"value": "@{pipeline().globalParameters.env} | @{if(greater(activity('count_success').output.firstRow.count,0),'FAILURE','SUCCESS')} | CARESYNC MASTER RUN",
 						"type": "Expression"
 					}
 				}
