@@ -1,0 +1,12 @@
+{
+	"name": "caresyncdfshy",
+	"properties": {
+		"globalParameters": {
+			"env": {
+				"type": "string",
+				"value": "PROD"
+			}
+		}
+	},
+	"location": "centralindia"
+}
