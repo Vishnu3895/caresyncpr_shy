@@ -91,7 +91,7 @@
 				"typeProperties": {
 					"variableName": "subject",
 					"value": {
-						"value": "@concat(pipeline().globalParameters.URL,'|',if(activity('count_success').output.count > 0,'FAILURE','SUCCESS'),'|','CARESYNC MASTER RUN')",
+						"value": "@{\n    if(\n        equals(activity('count_success').output.count,0),\n        'SUCCESS',\n        'FAILURE'\n        )\n        }",
 						"type": "Expression"
 					}
 				}
