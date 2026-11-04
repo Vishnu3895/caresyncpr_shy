@@ -152,7 +152,7 @@
 				"typeProperties": {
 					"variableName": "main",
 					"value": {
-						"value": "{\n    \"subject\":@{variables('subject')},\n    \"email receipients\":@{pipeline().globalParameters.emailreceipients},\n    \"body header\":@{variables('header')},\n    \"body footer\":@{variables('footer')},\n    \"status table\":@{activity('Read the Ctrl_audit_log').output.value}\n}",
+						"value": "{\n  \"subject\":\"@{variables('subject')}\",\n  \"email_receipients\":\"@{pipeline().globalParameters.emailreceipients}\",\n  \"body_header\":\"@{variables('header')}\",\n  \"body_footer\":\"@{variables('footer')}\",\n  \"status_table\":@{activity('Read the Ctrl_audit_log').output.value}\n}",
 						"type": "Expression"
 					}
 				}
