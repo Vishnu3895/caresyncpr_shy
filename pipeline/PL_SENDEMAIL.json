@@ -34,8 +34,6 @@
 			{
 				"name": "Body header",
 				"type": "SetVariable",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"secureOutput": false,
@@ -50,8 +48,6 @@
 			{
 				"name": "Body footer",
 				"type": "SetVariable",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"secureOutput": false,
@@ -78,6 +74,18 @@
 					},
 					{
 						"activity": "count_success",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Body footer",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Body header",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -124,6 +132,30 @@
 					},
 					"firstRowOnly": false
 				}
+			},
+			{
+				"name": "Main body",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Subject",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "main",
+					"value": {
+						"value": "{\n    \"subject\":@{variables('subject')},\n    \"email receipients\":@{pipeline().globalParameters.emailreceipients},\n    \"body header\":@{variables('header')},\n    \"body footer\":@{variables('footer')},\n    \"status\":@{activity('Read the Ctrl_audit_log').output.value}\n}",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
@@ -143,6 +175,9 @@
 				"type": "String"
 			},
 			"test": {
+				"type": "String"
+			},
+			"main": {
 				"type": "String"
 			}
 		},
