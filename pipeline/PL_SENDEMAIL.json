@@ -91,7 +91,7 @@
 				"typeProperties": {
 					"variableName": "subject",
 					"value": {
-						"value": "@activity('count_success').output.value[0].counts",
+						"value": "@{if(equals(activity('count_success').output.value[0].counts,0),\n'SUCCESS',\n'FAILURE'\n)\n}",
 						"type": "Expression"
 					}
 				}
