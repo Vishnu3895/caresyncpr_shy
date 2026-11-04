@@ -1,0 +1,91 @@
+{
+	"name": "PL_SENDEMAIL",
+	"properties": {
+		"activities": [
+			{
+				"name": "Read the Ctrl_audit_log",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "select * from ctrl.audit_log where adf_run_id = '@{pipeline().parameters.adf_run_id}'",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "AzureSqlTable1",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Body header",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "header",
+					"value": "Ingestion and Transformation process for caresync has been completed."
+				}
+			},
+			{
+				"name": "Body footer",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "footer",
+					"value": {
+						"value": "For any queries ,please contact on +91342325252",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Subject",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": []
+			}
+		],
+		"parameters": {
+			"adf_run_id": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"header": {
+				"type": "String"
+			},
+			"footer": {
+				"type": "String"
+			}
+		},
+		"annotations": []
+	}
+}
