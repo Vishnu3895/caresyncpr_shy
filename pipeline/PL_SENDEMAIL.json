@@ -99,7 +99,7 @@
 				"typeProperties": {
 					"variableName": "subject",
 					"value": {
-						"value": "@concat(pipeline().globalParameters.env,'|',if(equals(activity('count_success').output.value[0].counts,0),'SUCCESS','FAILURE'),'|','CARESYNC MASTER RUN')",
+						"value": "@{pipeline().globalParameters.env}|@{if(greater(activity('count_success').output.value,0),'FAILURE','SUCCESS')}|CARESYNC MASTER RUN",
 						"type": "Expression"
 					}
 				}
@@ -120,7 +120,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "select count(*) as counts from ctrl.audit_log where adf_run_id ='@{pipeline().parameters.adf_run_id}' and status IN ('FAILURE','IN_PROGRESS')",
+							"value": "select count(*) from ctrl.audit_log where adf_run_id ='@{pipeline().parameters.adf_run_id}' and status IN ('FAILURE','IN_PROGRESS')",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -130,7 +130,7 @@
 						"referenceName": "AzureSqlTable1",
 						"type": "DatasetReference"
 					},
-					"firstRowOnly": false
+					"firstRowOnly": true
 				}
 			},
 			{
